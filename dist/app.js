@@ -12,7 +12,7 @@ const env_1 = require("./app/config/env");
 const globalErrorHandler_1 = require("./app/middlewares/globalErrorHandler");
 const notFound_1 = __importDefault(require("./app/middlewares/notFound"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
-const routes_1 = require("./app/routes");
+const routes_1 = __importDefault(require("./app/routes"));
 const app = (0, express_1.default)();
 app.use((0, express_session_1.default)({
     secret: env_1.envVars.EXPRESS_SESSION_SECRET,
@@ -30,7 +30,7 @@ app.use((0, cors_1.default)({
     ],
     credentials: true,
 }));
-app.use("/api/v1", routes_1.router);
+app.use("/api/v1", routes_1.default);
 app.get("/", (req, res) => {
     res.status(200).json({
         message: "Welcome to Parcel delivery system Backend"
