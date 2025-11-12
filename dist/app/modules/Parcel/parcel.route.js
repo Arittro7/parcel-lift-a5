@@ -1,29 +1,25 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ParcelRoutes = void 0;
+exports.parcelRoutes = void 0;
 const express_1 = require("express");
-const parcel_controller_1 = require("./parcel.controller");
+const parcel_controler_1 = require("./parcel.controler");
 const validateRequest_1 = require("../../middlewares/validateRequest");
-const checkAuth_1 = require("../../middlewares/checkAuth");
-const user_interface_1 = require("../User/user.interface");
 const parcel_validation_1 = require("./parcel.validation");
+const user_interface_1 = require("../user/user.interface");
+const checkAuth_1 = require("../../middlewares/checkAuth");
 const router = (0, express_1.Router)();
+router.get("/tracking/:id", parcel_controler_1.ParcelControllers.getParcelsByTrackingId);
 // sender
-router.post("/", (0, checkAuth_1.checkAuth)(user_interface_1.Role.SENDER), (0, validateRequest_1.validateRequest)(parcel_validation_1.createParcelZodSchema), parcel_controller_1.ParcelControllers.createParcel);
-router.patch("/cancel/:id", (0, checkAuth_1.checkAuth)(user_interface_1.Role.SENDER), parcel_controller_1.ParcelControllers.cancelParcel);
-router.get("/my-parcels", (0, checkAuth_1.checkAuth)(user_interface_1.Role.SENDER), parcel_controller_1.ParcelControllers.getMyParcels);
-// receiver
-router.get("/incoming", (0, checkAuth_1.checkAuth)(user_interface_1.Role.RECEIVER), parcel_controller_1.ParcelControllers.getIncomingParcels);
-router.patch("/confirm-delivery/:id", (0, checkAuth_1.checkAuth)(user_interface_1.Role.RECEIVER), parcel_controller_1.ParcelControllers.confirmDelivery);
-router.get("/history", (0, checkAuth_1.checkAuth)(user_interface_1.Role.RECEIVER), parcel_controller_1.ParcelControllers.getDeliveryHistory);
+router.post("/", (0, checkAuth_1.checkAuth)(user_interface_1.Role.SENDER), (0, validateRequest_1.validateRequest)(parcel_validation_1.createParcelZodSchema), parcel_controler_1.ParcelControllers.createParcel);
+router.get("/my", (0, checkAuth_1.checkAuth)(user_interface_1.Role.SENDER), parcel_controler_1.ParcelControllers.getTheirParcels);
+router.patch("/cancel/:id", (0, checkAuth_1.checkAuth)(user_interface_1.Role.SENDER), parcel_controler_1.ParcelControllers.cancelParcel);
+// receiver route
+router.get("/incoming", (0, checkAuth_1.checkAuth)(user_interface_1.Role.RECEIVER), parcel_controler_1.ParcelControllers.getIncomingParcels);
+router.patch("/confirmDelivery/:id", (0, checkAuth_1.checkAuth)(user_interface_1.Role.RECEIVER), parcel_controler_1.ParcelControllers.confirmParcelDelivery);
+router.get("/delivered", (0, checkAuth_1.checkAuth)(user_interface_1.Role.RECEIVER), parcel_controler_1.ParcelControllers.getDeliveryHistory);
 // admin
-router.get("/all-parcels", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN, user_interface_1.Role.SUPER_ADMIN), parcel_controller_1.ParcelControllers.getAllParcels);
-router.patch("/status/:id", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN, user_interface_1.Role.SUPER_ADMIN), (0, validateRequest_1.validateRequest)(parcel_validation_1.updateParcelStatusZodSchema), parcel_controller_1.ParcelControllers.updateParcelStatus);
-router.patch("/block/:id", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN, user_interface_1.Role.SUPER_ADMIN), parcel_controller_1.ParcelControllers.blockOrUnblockParcel);
-router.get("/stats", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN, user_interface_1.Role.SUPER_ADMIN), parcel_controller_1.ParcelControllers.getStats);
-// for all
-router.get("/:id", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN, user_interface_1.Role.SUPER_ADMIN, user_interface_1.Role.SENDER, user_interface_1.Role.RECEIVER), parcel_controller_1.ParcelControllers.getParcelById);
-router.get("/track/:trackingId", parcel_controller_1.ParcelControllers.trackParcel);
-// admin and receiver
-router.patch("/return/:id", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN, user_interface_1.Role.SUPER_ADMIN, user_interface_1.Role.RECEIVER), parcel_controller_1.ParcelControllers.returnParcel);
-exports.ParcelRoutes = router;
+router.get("/all-parcels", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN), parcel_controler_1.ParcelControllers.getAllParcels);
+router.patch("/block/:id", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN), parcel_controler_1.ParcelControllers.blockParcel);
+router.patch("/unblock/:id", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN), parcel_controler_1.ParcelControllers.unblockParcel);
+router.patch("/update-status/:id", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN), parcel_controler_1.ParcelControllers.updateParcelStatus);
+exports.parcelRoutes = router;

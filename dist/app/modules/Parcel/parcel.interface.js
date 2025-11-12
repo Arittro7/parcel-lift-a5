@@ -1,13 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ParcelStatus = void 0;
-var ParcelStatus;
-(function (ParcelStatus) {
-    ParcelStatus["REQUESTED"] = "REQUESTED";
-    ParcelStatus["APPROVED"] = "APPROVED";
-    ParcelStatus["RETURNED"] = "RETURNED";
-    ParcelStatus["DISPATCHED"] = "DISPATCHED";
-    ParcelStatus["IN_TRANSIT"] = "IN_TRANSIT";
-    ParcelStatus["DELIVERED"] = "DELIVERED";
-    ParcelStatus["CANCELED"] = "CANCELED";
-})(ParcelStatus || (exports.ParcelStatus = ParcelStatus = {}));
+exports.Status = void 0;
+var Status;
+(function (Status) {
+    Status["REQUESTED"] = "REQUESTED";
+    Status["APPROVED"] = "APPROVED";
+    Status["DISPATCHED"] = "DISPATCHED";
+    Status["IN_TRANSIT"] = "IN_TRANSIT";
+    Status["DELIVERED"] = "DELIVERED";
+    Status["CANCELLED"] = "CANCELLED";
+    Status["FAILED_DELIVERY"] = "FAILED_DELIVERY";
+    Status["RESCHEDULED"] = "RESCHEDULED";
+})(Status || (exports.Status = Status = {}));

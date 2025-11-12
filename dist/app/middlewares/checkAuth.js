@@ -13,26 +13,89 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkAuth = void 0;
+const http_status_codes_1 = __importDefault(require("http-status-codes"));
+const env_1 = require("../config/env");
 const AppError_1 = __importDefault(require("../errorHelpers/AppError"));
 const jwt_1 = require("../utils/jwt");
-const env_1 = require("../config/env");
+const user_interface_1 = require("../modules/user/user.interface");
+const user_model_1 = require("../modules/user/user.model");
 const checkAuth = (...authRoles) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const accessToken = req.headers.authorization;
-        if (!accessToken) {
+        const rawToken = req.cookies.accessToken || req.headers.authorization;
+        if (!rawToken) {
+            console.log("❌ No token received");
             throw new AppError_1.default(403, "No Token Received");
         }
+        const accessToken = rawToken.startsWith("Bearer ")
+            ? rawToken.split(" ")[1]
+            : rawToken;
+        console.log("🔑 Access Token:", accessToken);
         const verifiedToken = (0, jwt_1.verifyToken)(accessToken, env_1.envVars.JWT_ACCESS_SECRET);
-        req.user = verifiedToken;
-        if (!authRoles.includes(verifiedToken.role)) {
-            throw new AppError_1.default(403, "You are not permitted to view this route");
+        console.log("✅ Decoded Token:", verifiedToken);
+        const isUserExist = yield user_model_1.User.findOne({ email: verifiedToken.email });
+        console.log("👤 User from DB:", isUserExist);
+        if (!isUserExist) {
+            throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "User does not exist");
         }
-        console.log("Verified Token", verifiedToken);
+        if (isUserExist.isActive === user_interface_1.IsActive.BLOCKED ||
+            isUserExist.isActive === user_interface_1.IsActive.INACTIVE) {
+            throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, `User is ${isUserExist.isActive}`);
+        }
+        if (isUserExist.isDeleted) {
+            throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "User is deleted");
+        }
+        if (!authRoles.includes(verifiedToken.role)) {
+            console.log("❌ Role not permitted:", verifiedToken.role);
+            throw new AppError_1.default(403, "You are not permitted to view this route!!!");
+        }
+        req.user = verifiedToken;
         next();
     }
     catch (error) {
-        console.log("JWT Error:", error);
+        console.error("❌ Auth error:", error);
         next(error);
     }
 });
 exports.checkAuth = checkAuth;
+// import  httpStatus  from 'http-status-codes';
+// import { NextFunction, Request, Response } from "express";
+// import { JwtPayload } from "jsonwebtoken";
+// import { envVars } from "../config/env";
+// import AppError from "../errorHelpers/AppError";
+// import { verifyToken } from "../utils/jwt";
+// import { IsActive } from '../modules/user/user.interface';
+// import { User } from '../modules/user/user.model';
+// export const checkAuth =
+//   (...authRoles: string[]) =>
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const accessToken = req.cookies.accessToken || req.headers.authorization;
+//       if (!accessToken) {
+//         throw new AppError(403, "No Token Received");
+//       }
+//       const verifiedToken = verifyToken(
+//         accessToken,
+//         envVars.JWT_ACCESS_SECRET
+//       ) as JwtPayload;
+//               const isUserExist = await User.findOne({ email: verifiedToken.email })
+//         if (!isUserExist) {
+//             throw new AppError(httpStatus.BAD_REQUEST, "User does not exist")
+//         }
+//         // if (!isUserExist.isVerified) {
+//         //     throw new AppError(httpStatus.BAD_REQUEST, "User is not verified")
+//         // }
+//         if (isUserExist.isActive === IsActive.BLOCKED || isUserExist.isActive === IsActive.INACTIVE) {
+//             throw new AppError(httpStatus.BAD_REQUEST, `User is ${isUserExist.isActive}`)
+//         }
+//         if (isUserExist.isDeleted) {
+//             throw new AppError(httpStatus.BAD_REQUEST, "User is deleted")
+//         }
+//       if (!authRoles.includes(verifiedToken.role)) {
+//         throw new AppError(403, "You are not permitted to view this route!!!");
+//       }
+//       req.user = verifiedToken;
+//       next();
+//     } catch (error) {
+//       next(error);
+//     }
+//   };

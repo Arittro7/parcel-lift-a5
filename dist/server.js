@@ -15,14 +15,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const app_1 = __importDefault(require("./app"));
 const env_1 = require("./app/config/env");
-const seedSuperAdmin_1 = require("./app/utils/seedSuperAdmin");
+const seedAdmin_1 = require("./app/utils/seedAdmin");
 let server;
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield mongoose_1.default.connect(env_1.envVars.DB_URL);
-        console.log("🚚 Connected to DB ⛳");
+        console.log("⛳Connected to DB!!");
         server = app_1.default.listen(env_1.envVars.PORT, () => {
-            console.log("Server is Listening to port 5000");
+            console.log(`Server is listening to port ${env_1.envVars.PORT}`);
         });
     }
     catch (error) {
@@ -31,30 +31,37 @@ const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
 });
 (() => __awaiter(void 0, void 0, void 0, function* () {
     yield startServer();
-    yield (0, seedSuperAdmin_1.seedSuperAdmin)();
+    yield (0, seedAdmin_1.seedAdmin)();
 }))();
-// ▶️ Handle Unhandled Promise Rejection
-process.on("unhandledRejection", (err) => {
-    console.log("Unhandled Rejection detected. Server is shutting down!", err);
-    if (server) {
-        server.close(() => {
-            process.exit(1);
-        });
-    }
-    process.exit(1);
-});
-// ▶️ Handle Uncaught Exception
-process.on("uncaughtException", (err) => {
-    console.log("Uncaught Exception happened. Server shutting down!", err);
-    if (server) {
-        server.close(() => {
-            process.exit(1);
-        });
-    }
-    process.exit(1);
-});
-// ▶️ Handle SIGTERM (Termination Signal from Server/Host)
 process.on("SIGTERM", () => {
+    console.log("SIGTERM signal received... Server shutting down..");
+    if (server) {
+        server.close(() => {
+            process.exit(1);
+        });
+    }
+    process.exit(1);
+});
+process.on("SIGINT", () => {
+    console.log("SIGINT signal received... Server shutting down..");
+    if (server) {
+        server.close(() => {
+            process.exit(1);
+        });
+    }
+    process.exit(1);
+});
+process.on("unhandledRejection", (err) => {
+    console.log("Unhandled Rejecttion detected... Server shutting down..", err);
+    if (server) {
+        server.close(() => {
+            process.exit(1);
+        });
+    }
+    process.exit(1);
+});
+process.on("uncaughtException", (err) => {
+    console.log("Uncaught Exception detected... Server shutting down..", err);
     if (server) {
         server.close(() => {
             process.exit(1);

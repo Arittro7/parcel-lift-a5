@@ -8,66 +8,37 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthServices = void 0;
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-const http_status_codes_1 = __importDefault(require("http-status-codes"));
-const AppError_1 = __importDefault(require("../../errorHelpers/AppError"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const user_model_1 = require("../User/user.model");
-const usersToken_1 = require("../../utils/usersToken");
 const env_1 = require("../../config/env");
-const credentialsLogin = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, password } = payload;
-    const isUserExist = yield user_model_1.User.findOne({ email });
-    if (!isUserExist) {
-        throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Email does not exist");
-    }
-    const isPasswordMatched = yield bcryptjs_1.default.compare(password, isUserExist.password);
-    if (!isPasswordMatched) {
-        throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Incorrect Password");
-    }
-    const userToken = (0, usersToken_1.createUsersToken)(isUserExist);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const _a = isUserExist.toObject(), { password: pass } = _a, rest = __rest(_a, ["password"]);
+const AppError_1 = __importDefault(require("../../errorHelpers/AppError"));
+const user_model_1 = require("../user/user.model");
+const userTokens_1 = require("../../utils/userTokens");
+const getNewAccessToken = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
+    const newAccessToken = yield (0, userTokens_1.createNewAccessTokenWithRefreshToken)(refreshToken);
     return {
-        accessToken: userToken.accessToken,
-        refreshToken: userToken.refreshToken,
-        rest
+        accessToken: newAccessToken,
     };
 });
-const getNewAccessToken = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
-    const newAccessToken = yield (0, usersToken_1.createNewAccessTokenWithRefreshToken)(refreshToken);
-    return newAccessToken;
-    // return{
-    //   accessToken : newAccessToken
-    // }
-});
-const resetPassword = (oldPassword, newPassword, decodedToken) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield user_model_1.User.findById(decodedToken.userId);
-    const isOldPasswordMatch = yield bcryptjs_1.default.compare(oldPassword, user.password);
-    if (!isOldPasswordMatch) {
-        throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, "Old Password doesn't match");
+const resetPassword = (payload, decodedToken) => __awaiter(void 0, void 0, void 0, function* () {
+    if (payload.id != decodedToken.userId) {
+        throw new AppError_1.default(401, "You can not reset your password");
     }
-    user.password = yield bcryptjs_1.default.hash(newPassword, Number(env_1.envVars.BCRYPT_SALT_ROUND));
-    user.save();
+    const isUserExist = yield user_model_1.User.findById(decodedToken.userId);
+    if (!isUserExist) {
+        throw new AppError_1.default(401, "User does not exist");
+    }
+    const hashedPassword = yield bcryptjs_1.default.hash(payload.newPassword, Number(env_1.envVars.BCRYPT_SALT_ROUND));
+    isUserExist.password = hashedPassword;
+    yield isUserExist.save();
 });
 exports.AuthServices = {
-    credentialsLogin,
     getNewAccessToken,
-    resetPassword
+    resetPassword,
 };

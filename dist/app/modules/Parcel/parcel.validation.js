@@ -3,35 +3,48 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateParcelStatusZodSchema = exports.createParcelZodSchema = void 0;
+exports.createParcelZodSchema = void 0;
 const zod_1 = __importDefault(require("zod"));
 const parcel_interface_1 = require("./parcel.interface");
-exports.createParcelZodSchema = zod_1.default.object({
-    receiver: zod_1.default
-        .string({ message: "Receiver ID is required" })
-        .regex(/^[a-f\d]{24}$/i, "Receiver must be a valid MongoDB ObjectId"),
-    parcelType: zod_1.default
-        .string({ message: "Parcel type is required" })
-        .min(2, "Parcel type must be at least 2 characters long"),
-    weight: zod_1.default
-        .number({ message: "Weight is required" })
-        .positive("Weight must be a positive number"),
-    pickupAddress: zod_1.default
-        .string({ message: "Pickup address is required" })
-        .min(5, "Pickup address must be at least 5 characters"),
-    deliveryAddress: zod_1.default
-        .string({ message: "Delivery address is required" })
-        .min(5, "Delivery address must be at least 5 characters"),
-    fee: zod_1.default
-        .number({ message: "Fee is required" })
-        .nonnegative("Fee must be a non-negative number"),
+const trackingZodSchema = zod_1.default.object({
+    location: zod_1.default.string(),
+    status: zod_1.default.nativeEnum(parcel_interface_1.Status),
+    timestamp: zod_1.default.preprocess((val) => new Date(val), zod_1.default.date()),
 });
-exports.updateParcelStatusZodSchema = zod_1.default.object({
-    status: zod_1.default.enum(Object.values(parcel_interface_1.ParcelStatus), {
-        message: "Status is required",
+const addressZodSchema = zod_1.default.object({
+    division: zod_1.default.string(),
+    city: zod_1.default.string(),
+    street: zod_1.default.string(),
+    zip: zod_1.default.string(),
+});
+exports.createParcelZodSchema = zod_1.default.object({
+    name: zod_1.default.string({
+        error: "Parcel name is required",
     }),
-    note: zod_1.default
-        .string()
-        .max(200, "Note cannot exceed 200 characters")
-        .optional(),
+    trackingId: zod_1.default.string().optional(),
+    senderInfo: addressZodSchema,
+    deliveryLocation: addressZodSchema,
+    sameDivision: zod_1.default.boolean({
+        error: "sameDivision is required",
+    }),
+    sender: zod_1.default.string({
+        error: "Sender ID is required",
+    }),
+    receiver: zod_1.default.string({
+        error: "Receiver ID is required",
+    }),
+    status: zod_1.default.nativeEnum(parcel_interface_1.Status).optional(), // default handled in backend
+    trackingEvents: zod_1.default.array(trackingZodSchema).optional(),
+    weight: zod_1.default.number({
+        error: "Weight is required",
+    }),
+    estimatedDeliveryDate: zod_1.default.preprocess((val) => new Date(val), zod_1.default.date({
+        error: "Estimated delivery date is required",
+    })),
+    pickUpDate: zod_1.default.preprocess((val) => (val ? new Date(val) : undefined), zod_1.default.date().optional()),
+    deliveryDate: zod_1.default.preprocess((val) => (val ? new Date(val) : undefined), zod_1.default.date().optional()),
+    isBlocked: zod_1.default.boolean().optional(),
+    cost: zod_1.default.number({
+        error: "Cost is required",
+    }),
 });

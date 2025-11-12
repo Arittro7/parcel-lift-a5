@@ -7,48 +7,10 @@ exports.updateUserZodSchema = exports.createUserZodSchema = void 0;
 const zod_1 = __importDefault(require("zod"));
 const user_interface_1 = require("./user.interface");
 exports.createUserZodSchema = zod_1.default.object({
-    name: zod_1.default.string({ message: "Name must be string" })
-        .min(2, { message: "Name too short minimum 2 character required" })
-        .max(50, { message: "Name too long" }),
-    // `Name 👆🏾 Email 👇🏾 
-    email: zod_1.default
-        .string({ message: "Email must be string" })
-        .email({ message: "Invalid email address format" })
-        .min(5, { message: "Email must be at least 5 character long" })
-        .max(100, { message: "Email cannot exceed 100 character" }),
-    //` Password 
+    name: zod_1.default.string({ error: "name must be string" }),
+    email: zod_1.default.email({ error: "invalid email type" }),
     password: zod_1.default
-        .string({ message: "Password must be string" })
-        .min(8, { message: "Password must be at least 8 character long." })
-        .regex(/^(?=.*[A-Z])/, {
-        message: "Password must contain at least 1 uppercase letter.",
-    })
-        .regex(/^(?=.*[!@#$%^&*])/, {
-        message: "Password must contain at least 1 special character.",
-    })
-        .regex(/^(?=.*\d)/, {
-        message: "Password must contain at least 1 number.",
-    }),
-    //`Phone 
-    phone: zod_1.default
-        .string({ message: "Phone Number must be String" })
-        .regex(/^(?:\+8801\d{9}|01\d{9})$/, {
-        message: "Phone number must be valid for Bangladesh. Format: +8801XXXXXXXXX or 01XXXXXXXXX",
-    })
-        .optional(),
-    //`Address 
-    address: zod_1.default
-        .string({ message: "Address must be string" })
-        .max(200, { message: "Address cannot exceed 200 character" })
-        .optional(),
-});
-exports.updateUserZodSchema = zod_1.default.object({
-    name: zod_1.default
-        .string({ message: "Name must be string" })
-        .min(2, { message: "Name must be at least 2 characters long." })
-        .max(50, { message: "Name cannot exceed 50 characters." }).optional(),
-    password: zod_1.default
-        .string({ message: "Password must be string" })
+        .string({ error: "Password must be string" })
         .min(8, { message: "Password must be at least 8 characters long." })
         .regex(/^(?=.*[A-Z])/, {
         message: "Password must contain at least 1 uppercase letter.",
@@ -59,24 +21,45 @@ exports.updateUserZodSchema = zod_1.default.object({
         .regex(/^(?=.*\d)/, {
         message: "Password must contain at least 1 number.",
     }).optional(),
+    picture: zod_1.default.url().optional(),
     phone: zod_1.default
-        .string({ message: "Phone Number must be string" })
+        .string({ error: "Phone number must be a string" })
         .regex(/^(?:\+8801\d{9}|01\d{9})$/, {
         message: "Phone number must be valid for Bangladesh. Format: +8801XXXXXXXXX or 01XXXXXXXXX",
     })
         .optional(),
-    role: zod_1.default
-        .enum(Object.values(user_interface_1.Role))
-        .optional(),
-    status: zod_1.default
-        .enum(Object.values(user_interface_1.UserStatus.ACTIVE))
-        .optional(),
-    isDeleted: zod_1.default
-        .boolean().optional(),
-    isVerified: zod_1.default
-        .boolean().optional(),
+    role: zod_1.default.enum(Object.values(user_interface_1.Role)),
     address: zod_1.default
-        .string({ message: "Address must be string" })
-        .max(200, { message: "Address cannot exceed 200 characters." })
-        .optional()
+        .object({
+        division: zod_1.default.enum(Object.values(user_interface_1.Divisions)),
+        city: zod_1.default.string({ error: "city should be string" }),
+        zip: zod_1.default
+            .number({ error: "zip code must be in number" })
+            .min(4, { message: "zip code must be of 4 digits" })
+            .max(4, { message: "zip code cannot be larger than 4 digits" }),
+        street: zod_1.default.string({ error: "street should be string" }),
+    })
+        .optional(),
+});
+exports.updateUserZodSchema = zod_1.default.object({
+    name: zod_1.default.string({ error: "name must be a string" }).optional(),
+    email: zod_1.default.email({ error: "email is not valid" }).optional(),
+    picture: zod_1.default.url({ error: "Invalid url" }).optional(),
+    address: zod_1.default
+        .object({
+        division: zod_1.default.enum(Object.values(user_interface_1.Divisions)),
+        city: zod_1.default.string({ error: "city should be string" }),
+        zip: zod_1.default
+            .number({ error: "zip code must be in number" })
+            .min(1000, { message: "zip code must be of 4 digits" })
+            .max(9999, { message: "zip code cannot be larger than 4 digits" }),
+        street: zod_1.default.string({ error: "street should be string" }),
+    })
+        .optional(),
+    phone: zod_1.default
+        .string({ error: "Phone number must be a string" })
+        .regex(/^(?:\+8801\d{9}|01\d{9})$/, {
+        message: "Phone number must be valid for Bangladesh. Format: +8801XXXXXXXXX or 01XXXXXXXXX",
+    })
+        .optional(),
 });

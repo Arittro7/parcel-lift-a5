@@ -1,35 +1,76 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = void 0;
+exports.User = exports.addressSchema = void 0;
 const mongoose_1 = require("mongoose");
 const user_interface_1 = require("./user.interface");
-const authProviderSchema = new mongoose_1.Schema({
-    provider: { type: String, required: true },
-    providerId: { type: String, required: true },
-}, {
-    versionKey: false,
-    _id: false,
+const authProviderScheme = new mongoose_1.Schema({
+    provider: {
+        type: String,
+        required: true,
+    },
+    providerId: {
+        type: String,
+        required: true,
+    },
 });
+exports.addressSchema = new mongoose_1.Schema({
+    division: {
+        type: String,
+        enum: Object.values(user_interface_1.Divisions),
+        required: true,
+    },
+    city: {
+        type: String,
+        required: true,
+    },
+    zip: {
+        type: Number,
+        required: true,
+    },
+    street: {
+        type: String,
+        required: true,
+    },
+}, { _id: false });
 const userSchema = new mongoose_1.Schema({
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String },
+    name: {
+        type: String,
+        required: true,
+    },
+    email: {
+        type: String,
+        unique: true,
+        required: true,
+    },
+    password: {
+        type: String,
+    },
+    phone: {
+        type: String,
+    },
+    picture: {
+        type: String,
+    },
+    address: { type: exports.addressSchema },
     role: {
         type: String,
         enum: Object.values(user_interface_1.Role),
-        default: user_interface_1.Role.SENDER,
+        required: true,
     },
-    phone: { type: String },
-    picture: { type: String },
-    address: { type: String },
-    isDeleted: { type: Boolean, default: false },
-    status: {
+    isDeleted: {
+        type: Boolean,
+    },
+    isActive: {
         type: String,
-        enum: Object.values(user_interface_1.UserStatus),
-        default: user_interface_1.UserStatus.ACTIVE,
+        enum: Object.values(user_interface_1.IsActive),
+        default: user_interface_1.IsActive.ACTIVE,
     },
     isVerified: { type: Boolean, default: false },
-    auths: [authProviderSchema],
+    auths: [authProviderScheme],
+    parcels: {
+        type: [mongoose_1.Schema.Types.ObjectId],
+        ref: "Parcel",
+    },
 }, {
     timestamps: true,
     versionKey: false,

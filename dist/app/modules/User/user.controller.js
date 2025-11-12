@@ -12,13 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserController = void 0;
+exports.UserControllers = void 0;
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
-const user_service_1 = require("./user.service");
 const catchAsync_1 = require("../../utils/catchAsync");
+const user_service_1 = require("./user.service");
 const sendResponse_1 = require("../../utils/sendResponse");
 const createUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield user_service_1.userService.createUser(req.body);
+    const user = yield user_service_1.UserServices.createUser(req.body);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.CREATED,
@@ -26,53 +26,101 @@ const createUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(vo
         data: user,
     });
 }));
-const updateUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = req.params.id;
-    const verifiedToken = req.user;
-    const payload = req.body;
-    const user = yield user_service_1.userService.updateUser(userId, payload, verifiedToken);
-    (0, sendResponse_1.sendResponse)(res, {
-        success: true,
-        statusCode: http_status_codes_1.default.CREATED,
-        message: "User Updated Successfully",
-        data: user,
-    });
-}));
 const getAllUsers = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_service_1.userService.getAllUsers();
+    const query = req.query;
+    const result = yield user_service_1.UserServices.getAllUsers(query);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,
-        message: "All Users Retrieve successfully",
+        message: "All Users Retrieved Successfully",
         data: result.data,
-        meta: result.meta
+        meta: result.meta,
     });
 }));
-const blockUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = req.params.id;
-    const decodedId = req.user.userId;
-    const result = yield user_service_1.userService.blockUser(userId, decodedId);
+const getSingleUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const result = yield user_service_1.UserServices.getSingleUser(id);
     (0, sendResponse_1.sendResponse)(res, {
-        statusCode: http_status_codes_1.default.CREATED,
-        message: 'User blocked successfully',
         success: true,
+        statusCode: http_status_codes_1.default.OK,
+        message: "User Retrieved Successfully",
+        data: result.data,
+    });
+}));
+const getme = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const decodedToken = req.user;
+    const result = yield user_service_1.UserServices.getme(decodedToken.userId);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_codes_1.default.OK,
+        message: "Your profile Retrieved Successfully",
+        data: result.data,
+    });
+}));
+// const getme = catchAsync(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     const decodedToken = req.user as JwtPayload;
+//     const result = await UserServices.getmeById(decodedToken.userId);
+//     sendResponse(res, {
+//       success: true,
+//       statusCode: httpStatus.OK,
+//       message: "Your profile Retrieved Successfully",
+//       data: result.data,
+//     });
+//   }
+// );
+const getUserByEmail = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const email = req.params.email;
+    const result = yield user_service_1.UserServices.getUserByEmail(email);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_codes_1.default.OK,
+        message: "Your profile Retrieved Successfully",
+        data: result.data,
+    });
+}));
+const updateUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const payload = req.body;
+    const decodedToken = req.user;
+    const result = yield user_service_1.UserServices.updateUser(id, payload, decodedToken);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        message: "User updated successfully!",
+        statusCode: 201,
         data: result,
     });
 }));
-const unblockUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = req.params.id;
-    const result = yield user_service_1.userService.unblockUser(userId);
+const toggleUserStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield user_service_1.UserServices.toggleUserStatus(req.params.id, req.body.isActive);
+    // Dynamic message based on isActive
+    let message = "";
+    switch (req.body.isActive) {
+        case "ACTIVE":
+            message = "User activated successfully!";
+            break;
+        case "INACTIVE":
+            message = "User set to inactive!";
+            break;
+        case "BLOCKED":
+            message = "User blocked successfully!";
+            break;
+        default:
+            message = "User status updated!";
+    }
     (0, sendResponse_1.sendResponse)(res, {
-        statusCode: http_status_codes_1.default.CREATED,
-        message: 'User unblocked successfully',
         success: true,
+        statusCode: http_status_codes_1.default.OK,
+        message,
         data: result,
     });
-}));
-exports.UserController = {
+});
+exports.UserControllers = {
     createUser,
     getAllUsers,
+    getSingleUser,
+    getme,
+    getUserByEmail,
     updateUser,
-    blockUser,
-    unblockUser
+    toggleUserStatus,
 };
