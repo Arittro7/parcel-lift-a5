@@ -6,10 +6,10 @@ import {
   Profile,
   VerifyCallback,
 } from "passport-google-oauth20";
-import { User } from "../modules/user/user.model";
 import { envVars } from "./env";
 import { Strategy as LocalStrategy } from "passport-local";
 import { IsActive, Role } from "../modules/user/user.interface";
+import { User } from "../modules/user/user.model";
 
 passport.use(
   new LocalStrategy(

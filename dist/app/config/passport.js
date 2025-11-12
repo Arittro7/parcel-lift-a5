@@ -16,10 +16,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const passport_1 = __importDefault(require("passport"));
 const passport_google_oauth20_1 = require("passport-google-oauth20");
-const user_model_1 = require("../modules/user/user.model");
 const env_1 = require("./env");
 const passport_local_1 = require("passport-local");
 const user_interface_1 = require("../modules/user/user.interface");
+const user_model_1 = require("../modules/user/user.model");
 passport_1.default.use(new passport_local_1.Strategy({
     usernameField: "email",
     passwordField: "password",
