@@ -48,7 +48,7 @@ const getAllUsers = async (query: Record<string, string>) => {
 
   const [data, meta] = await Promise.all([
     usersData.build(),
-    queryBuilder.getMeta(),
+    queryBuilder.getmeta(),
   ]);
   return {
     data,
@@ -63,20 +63,19 @@ const getSingleUser = async (id: string) => {
   };
 };
 
-// const getMe = async (userId: string) => {
+// const getme = async (userId: string) => {
 //   const user = await User.findById(userId).select("-password");
 //   return {
 //     data: user,
 //   };
 // };
 
-const getMeById = async (userId: string) => {
+const getmeById = async (userId: string) => {
   const user = await User.findById(userId).select("-password");
   return {
     data: user,
   };
 };
-
 
 const getUserByEmail = async (email: string) => {
   const user = await User.findOne({ email }).select("-password");
@@ -145,13 +144,12 @@ const toggleUserStatus = async (
   return user;
 };
 
-
 export const UserServices = {
   createUser,
   getAllUsers,
   getSingleUser,
-  // getMe,
-  getMeById,
+  // getme,
+  getmeById,
   getUserByEmail,
   updateUser,
   toggleUserStatus,

@@ -48,10 +48,10 @@ const getSingleUser = catchAsync(
   }
 );
 
-// const getMe = catchAsync(
+// const getme = catchAsync(
 //   async (req: Request, res: Response, next: NextFunction) => {
 //     const decodedToken = req.user as JwtPayload;
-//     const result = await UserServices.getMe(decodedToken.userId);
+//     const result = await UserServices.getme(decodedToken.userId);
 //     sendResponse(res, {
 //       success: true,
 //       statusCode: httpStatus.OK,
@@ -61,10 +61,10 @@ const getSingleUser = catchAsync(
 //   }
 // );
 
-const getMe = catchAsync(
+const getme = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const decodedToken = req.user as JwtPayload;
-    const result = await UserServices.getMeById(decodedToken.userId);
+    const result = await UserServices.getmeById(decodedToken.userId);
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
@@ -136,12 +136,11 @@ const toggleUserStatus = async (req: Request, res: Response) => {
   });
 };
 
-
 export const UserControllers = {
   createUser,
   getAllUsers,
   getSingleUser,
-  getMe,
+  getme,
   getUserByEmail,
   updateUser,
   toggleUserStatus,

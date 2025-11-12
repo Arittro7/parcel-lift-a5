@@ -54,7 +54,7 @@ class QueryBuilder {
     build() {
         return this.modelQuery;
     }
-    getMeta() {
+    getmeta() {
         return __awaiter(this, void 0, void 0, function* () {
             const totalDocuments = yield this.modelQuery.model.countDocuments();
             const page = Number(this.query.page) || 1;

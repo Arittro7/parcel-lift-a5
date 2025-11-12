@@ -75,9 +75,11 @@ export class QueryBuilder<T extends Document> {
   }
 
   /** 📊 Get pagination + total info */
-  async getMeta() {
+  async getmeta() {
     const filterConditions = this.modelQuery.getQuery(); // Get applied filters/search
-    const totalDocuments = await this.modelQuery.model.countDocuments(filterConditions);
+    const totalDocuments = await this.modelQuery.model.countDocuments(
+      filterConditions
+    );
 
     const page = Number(this.query.page) || 1;
     const limit = Number(this.query.limit) || 10;

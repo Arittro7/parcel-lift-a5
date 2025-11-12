@@ -7,13 +7,20 @@ import { createUserZodSchema, updateUserZodSchema } from "./user.validation";
 
 const router = Router();
 
+router.get("/getme", checkAuth(...Object.values(Role)), UserControllers.getme);
+
+router.get(
+  "/:id",
+  checkAuth(...Object.values(Role)),
+  UserControllers.getSingleUser
+);
+
 router.post(
   "/register",
   validateRequest(createUserZodSchema),
   UserControllers.createUser
 );
 router.get("/all-users", checkAuth(Role.ADMIN), UserControllers.getAllUsers);
-router.get("/getMe", checkAuth(...Object.values(Role)), UserControllers.getMe);
 router.get(
   "/getUserByEmail/:email",
   checkAuth(...Object.values(Role)),
@@ -24,11 +31,7 @@ router.patch(
   checkAuth(Role.ADMIN),
   UserControllers.toggleUserStatus
 );
-router.get(
-  "/:id",
-  checkAuth(...Object.values(Role)),
-  UserControllers.getSingleUser
-);
+
 router.patch(
   "/:id",
   validateRequest(updateUserZodSchema),

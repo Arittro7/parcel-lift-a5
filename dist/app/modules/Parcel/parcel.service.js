@@ -80,7 +80,7 @@ const getParcelsBySender = (senderId, query) => __awaiter(void 0, void 0, void 0
         .paginate()
         .fields();
     const result = yield queryBuilder.build();
-    const meta = yield queryBuilder.getMeta();
+    const meta = yield queryBuilder.getmeta();
     return { meta, data: result };
 });
 // receiver
@@ -92,7 +92,7 @@ const getParcelsByReceiver = (receiverId, query) => __awaiter(void 0, void 0, vo
         .paginate()
         .fields();
     const result = yield queryBuilder.build();
-    const meta = yield queryBuilder.getMeta();
+    const meta = yield queryBuilder.getmeta();
     return { meta, data: result };
 });
 const confirmDelivery = (receiverId, parcelId) => __awaiter(void 0, void 0, void 0, function* () {
@@ -123,7 +123,7 @@ const getDeliveryHistoryByReceiver = (receiverId, query) => __awaiter(void 0, vo
         .paginate()
         .fields();
     const result = yield queryBuilder.build();
-    const meta = yield queryBuilder.getMeta();
+    const meta = yield queryBuilder.getmeta();
     return { meta, data: result };
 });
 // Admin
@@ -135,7 +135,7 @@ const getAllParcels = (query) => __awaiter(void 0, void 0, void 0, function* () 
         .paginate()
         .fields();
     const result = yield queryBuilder.build();
-    const meta = yield queryBuilder.getMeta();
+    const meta = yield queryBuilder.getmeta();
     return { meta, data: result };
 });
 const updateParcelStatus = (adminId, parcelId, status, note) => __awaiter(void 0, void 0, void 0, function* () {
