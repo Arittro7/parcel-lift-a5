@@ -2,7 +2,6 @@
 
 import { model, Schema } from "mongoose";
 import { IParcel, ITracking, Status } from "./parcel.interface";
-
 import { addressSchema } from "../user/user.model";
 import { FormatDate } from "../../utils/formatDate";
 
