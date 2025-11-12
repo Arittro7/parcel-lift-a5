@@ -2,7 +2,6 @@
 
 import { model, Schema } from "mongoose";
 import { IParcel, ITracking, Status } from "./parcel.interface";
-import { v4 as uuidv4 } from "uuid";
 
 import { addressSchema } from "../user/user.model";
 import { FormatDate } from "../../utils/formatDate";
@@ -93,14 +92,15 @@ const parcelSchema = new Schema<IParcel>(
 );
 
 // -------------------- Pre-save Hook --------------------
-parcelSchema.pre("save", function (next) {
-  if (!this.trackingId) {
-    const date = FormatDate(new Date());
-    const uniqueId = uuidv4();
-    const trackingId = `TRK-${date}-${uniqueId.replace(/-/g, "").substring(0, 12)}`;
-    this.trackingId = trackingId;
-  }
+
+parcelSchema.pre("save", async function (next) {
+  const { v4: uuidv4 } = await import("uuid");
+  const date = FormatDate(new Date());
+  const uniqueId = uuidv4();
+  const trackingId = `TRK-${date}-${uniqueId.replace(/-/g, "").substring(0, 12)}`;
+  this.trackingId = trackingId;
   next();
 });
+
 
 export const Parcel = model<IParcel>("Parcel", parcelSchema);
