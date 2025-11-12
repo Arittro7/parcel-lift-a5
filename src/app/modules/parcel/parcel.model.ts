@@ -1,9 +1,12 @@
+// src/app/modules/parcel/parcel.model.ts
+
 import { model, Schema } from "mongoose";
 import { IParcel, ITracking, Status } from "./parcel.interface";
-import { v4 as uuid4 } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import { addressSchema } from "../user/user.model";
 import { FormatDate } from "../../utils/formatDate";
 
+// -------------------- Tracking Schema
 export const trackingSchema = new Schema<ITracking>(
   {
     status: {
@@ -11,20 +14,28 @@ export const trackingSchema = new Schema<ITracking>(
       enum: Object.values(Status),
       required: true,
     },
-    at: Date,
+    at: {
+      type: Date,
+      default: Date.now,
+    },
   },
   {
     _id: false,
   }
 );
+
+// -------------------- Parcel Schema
 const parcelSchema = new Schema<IParcel>(
   {
     name: {
       type: String,
       required: true,
+      trim: true,
     },
     trackingId: {
       type: String,
+      unique: true,
+      index: true,
     },
     senderInfo: addressSchema,
     deliveryLocation: addressSchema,
@@ -48,31 +59,30 @@ const parcelSchema = new Schema<IParcel>(
       default: Status.REQUESTED,
       uppercase: true,
     },
-    trackingEvents: [trackingSchema],
+    trackingEvents: {
+      type: [trackingSchema],
+      default: [],
+    },
     weight: {
       type: Number,
       required: true,
+      min: 0,
     },
     estimatedDeliveryDate: {
       type: Date,
       required: true,
     },
-    pickUpDate: {
-      type: Date,
-    },
-    deliveryDate: {
-      type: Date,
-    },
-    cancelledAt: {
-      type: Date,
-    },
+    pickUpDate: Date,
+    deliveryDate: Date,
+    cancelledAt: Date,
     isBlocked: {
       type: Boolean,
-      default: false
+      default: false,
     },
     cost: {
       type: Number,
       required: true,
+      min: 0,
     },
   },
   {
@@ -81,13 +91,15 @@ const parcelSchema = new Schema<IParcel>(
   }
 );
 
-parcelSchema.pre("save", async function (next) {
-  const date = FormatDate(new Date());
-  const uniqueId = uuid4();
-  const trackingId = `TRK-${date}-${uniqueId
-    .replace(/-g/, "")
-    .substring(0, 12)}`;
-  this.trackingId = trackingId;
+// -------------------- Pre-save Hook --------------------
+parcelSchema.pre("save", function (next) {
+  if (!this.trackingId) {
+    const date = FormatDate(new Date());
+    const uniqueId = uuidv4();
+    const trackingId = `TRK-${date}-${uniqueId.replace(/-/g, "").substring(0, 12)}`;
+    this.trackingId = trackingId;
+  }
   next();
 });
+
 export const Parcel = model<IParcel>("Parcel", parcelSchema);
