@@ -63,19 +63,19 @@ const getSingleUser = async (id: string) => {
   };
 };
 
-// const getme = async (userId: string) => {
-//   const user = await User.findById(userId).select("-password");
-//   return {
-//     data: user,
-//   };
-// };
-
-const getmeById = async (userId: string) => {
+const getme = async (userId: string) => {
   const user = await User.findById(userId).select("-password");
   return {
     data: user,
   };
 };
+
+// const getmeById = async (userId: string) => {
+//   const user = await User.findById(userId).select("-password");
+//   return {
+//     data: user,
+//   };
+// };
 
 const getUserByEmail = async (email: string) => {
   const user = await User.findOne({ email }).select("-password");
@@ -148,8 +148,8 @@ export const UserServices = {
   createUser,
   getAllUsers,
   getSingleUser,
-  // getme,
-  getmeById,
+  getme,
+  // getmeById,
   getUserByEmail,
   updateUser,
   toggleUserStatus,

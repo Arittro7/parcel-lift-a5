@@ -48,23 +48,10 @@ const getSingleUser = catchAsync(
   }
 );
 
-// const getme = catchAsync(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const decodedToken = req.user as JwtPayload;
-//     const result = await UserServices.getme(decodedToken.userId);
-//     sendResponse(res, {
-//       success: true,
-//       statusCode: httpStatus.OK,
-//       message: "Your profile Retrieved Successfully",
-//       data: result.data,
-//     });
-//   }
-// );
-
 const getme = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const decodedToken = req.user as JwtPayload;
-    const result = await UserServices.getmeById(decodedToken.userId);
+    const result = await UserServices.getme(decodedToken.userId);
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
@@ -73,6 +60,19 @@ const getme = catchAsync(
     });
   }
 );
+
+// const getme = catchAsync(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     const decodedToken = req.user as JwtPayload;
+//     const result = await UserServices.getmeById(decodedToken.userId);
+//     sendResponse(res, {
+//       success: true,
+//       statusCode: httpStatus.OK,
+//       message: "Your profile Retrieved Successfully",
+//       data: result.data,
+//     });
+//   }
+// );
 
 const getUserByEmail = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
