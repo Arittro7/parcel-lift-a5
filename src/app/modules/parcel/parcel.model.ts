@@ -3,6 +3,7 @@
 import { model, Schema } from "mongoose";
 import { IParcel, ITracking, Status } from "./parcel.interface";
 import { v4 as uuidv4 } from "uuid";
+
 import { addressSchema } from "../user/user.model";
 import { FormatDate } from "../../utils/formatDate";
 
