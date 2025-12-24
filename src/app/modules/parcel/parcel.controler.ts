@@ -8,6 +8,22 @@ import { JwtPayload } from "jsonwebtoken";
 import { Status } from "./parcel.interface";
 import AppError from "../../errorHelpers/AppError";
 
+const getAllParcels = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const query = req.query;
+    const Parcel = await ParcelServices.getAllParcels(
+      query as Record<string, string>
+    );
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "parcels Retrieved Successfully",
+      data: Parcel.data,
+      meta: Parcel.meta
+    });
+  }
+);
+
 const getParcelsByTrackingId = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const Parcel = await ParcelServices.getParcelsByTrackingId(req.params.id);
@@ -106,22 +122,6 @@ const getDeliveryHistory = catchAsync(
 );
 
 // admin
-const getAllParcels = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const query = req.query;
-    const Parcel = await ParcelServices.getAllParcels(
-      query as Record<string, string>
-    );
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: "parcels Retrieved Successfully",
-      data: Parcel.data,
-      meta: Parcel.meta
-    });
-  }
-);
-
 const blockParcel = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const Parcel = await ParcelServices.blockParcel(req.params.id);
@@ -172,6 +172,7 @@ const updateParcelStatus = catchAsync(
 );
 
 export const ParcelControllers = {
+  getAllParcels,
   getParcelsByTrackingId,
   createParcel,
   getTheirParcels,
@@ -179,7 +180,6 @@ export const ParcelControllers = {
   getIncomingParcels,
   confirmParcelDelivery,
   getDeliveryHistory,
-  getAllParcels,
   blockParcel,
   unblockParcel,
   updateParcelStatus,

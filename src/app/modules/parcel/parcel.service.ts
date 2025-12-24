@@ -2,6 +2,26 @@ import { QueryBuilder } from "../../utils/QueryBuilder";
 import { IParcel } from "./parcel.interface";
 import { Parcel } from "./parcel.model";
 
+const getAllParcels = async (query: Record<string, string>) => {
+  const parcelSearchableFields = ["name", "trackingId"];
+
+  const queryBuilder = new QueryBuilder(Parcel.find(), query);
+
+  const parcelsData = queryBuilder
+    .filter()
+    .search(parcelSearchableFields)
+    .sort()
+    .fields()
+    .paginate();
+
+  const [data, meta] = await Promise.all([
+    parcelsData.build(),
+    queryBuilder.getmeta(),
+  ]);
+
+  return { data, meta };
+};
+
 const getParcelsByTrackingId = async (id: string) => {
   const parcel = await Parcel.find({ trackingId: id });
   return parcel;
@@ -74,27 +94,6 @@ const getDeliveryHistory = async (receiverId: string) => {
 };
 
 // admin
-
-const getAllParcels = async (query: Record<string, string>) => {
-  const parcelSearchableFields = ["name", "trackingId"];
-
-  const queryBuilder = new QueryBuilder(Parcel.find(), query);
-
-  const parcelsData = queryBuilder
-    .filter()
-    .search(parcelSearchableFields)
-    .sort()
-    .fields()
-    .paginate();
-
-  const [data, meta] = await Promise.all([
-    parcelsData.build(),
-    queryBuilder.getmeta(),
-  ]);
-
-  return { data, meta };
-};
-
 const blockParcel = async (parcelId: string) => {
   const parcel = await Parcel.findByIdAndUpdate(
     parcelId,

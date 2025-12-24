@@ -8,6 +8,7 @@ import { checkAuth } from "../../middlewares/checkAuth";
 const router = Router()
 
 router.get("/tracking/:id", ParcelControllers.getParcelsByTrackingId)
+router.get("/all-parcels", ParcelControllers.getAllParcels)
 
 // sender
 router.post("/",checkAuth(Role.SENDER),validateRequest(createParcelZodSchema), ParcelControllers.createParcel)
