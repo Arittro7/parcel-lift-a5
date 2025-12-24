@@ -9,6 +9,7 @@ const router = Router()
 
 router.get("/tracking/:id", ParcelControllers.getParcelsByTrackingId)
 router.get("/all-parcels", ParcelControllers.getAllParcels)
+router.get("/parcels/:id", ParcelControllers.getParcelsById)
 
 // sender
 router.post("/",checkAuth(Role.SENDER),validateRequest(createParcelZodSchema), ParcelControllers.createParcel)

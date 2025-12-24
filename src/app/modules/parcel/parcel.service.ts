@@ -22,6 +22,11 @@ const getAllParcels = async (query: Record<string, string>) => {
   return { data, meta };
 };
 
+const getParcelsById = async (id: string) => {
+  const parcel = await Parcel.findById(id);
+  return parcel;
+};
+
 const getParcelsByTrackingId = async (id: string) => {
   const parcel = await Parcel.find({ trackingId: id });
   return parcel;
@@ -124,6 +129,7 @@ const updateParcelStatus = async (parcelId: string, status: string) => {
 export const ParcelServices = {
   getParcelsByTrackingId,
   createParcel,
+  getParcelsById,
   getTheirParcels,
   cancelParcel,
   getIncomingParcels,

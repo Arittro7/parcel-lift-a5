@@ -36,6 +36,18 @@ const getParcelsByTrackingId = catchAsync(
   }
 );
 
+const getParcelsById = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const Parcel = await ParcelServices.getParcelsById(req.params.id);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "parcel  Retrieved Successfully",
+      data: Parcel,
+    });
+  }
+);
+
 // sender
 const createParcel = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -175,6 +187,7 @@ export const ParcelControllers = {
   getAllParcels,
   getParcelsByTrackingId,
   createParcel,
+  getParcelsById,
   getTheirParcels,
   cancelParcel,
   getIncomingParcels,
