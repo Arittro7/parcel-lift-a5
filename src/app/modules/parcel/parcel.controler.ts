@@ -183,6 +183,19 @@ const updateParcelStatus = catchAsync(
   }
 );
 
+const getParcelStats = catchAsync(
+  async (req: Request, res: Response) => {
+    const stats = await ParcelServices.getParcelStats();
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Parcel statistics retrieved successfully",
+      data: stats,
+    });
+  }
+);
+
 export const ParcelControllers = {
   getAllParcels,
   getParcelsByTrackingId,
@@ -196,4 +209,5 @@ export const ParcelControllers = {
   blockParcel,
   unblockParcel,
   updateParcelStatus,
+  getParcelStats
 };

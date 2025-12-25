@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { QueryBuilder } from "../../utils/QueryBuilder";
 import { IParcel } from "./parcel.interface";
 import { Parcel } from "./parcel.model";
@@ -126,6 +127,74 @@ const updateParcelStatus = async (parcelId: string, status: string) => {
   return parcel;
 };
 
+
+// Parcel Stats
+const getParcelStats = async () => {
+  // Status Counts
+  let statusCounts = await Parcel.aggregate([
+    {
+      $group: {
+        _id: "$status",
+        name: { $first: "$status" },
+        value: { $sum: 1 },
+      },
+    },
+  ]);
+
+  if (statusCounts.length === 0) {
+    statusCounts = [
+      { name: "No Parcels Yet", value: 0 },
+    ];
+  } else {
+    statusCounts = statusCounts.map((item: any) => {
+      let displayName = "Pending";
+      if (item.name && typeof item.name === "string") {
+        displayName = item.name
+          .split("_")
+          .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+          .join(" ");
+      }
+      return { name: displayName, value: item.value || 0 };
+    });
+  }
+
+  // Monthly parcels - also handle empty
+  let monthlyParcels = await Parcel.aggregate([
+    {
+      $group: {
+        _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+        parcels: { $sum: 1 },
+      },
+    },
+    {
+      $sort: { _id: 1 },
+    },
+    {
+      $project: {
+        _id: 0,
+        month: { $substr: ["$_id", 5, 2] },
+        parcels: 1,
+      },
+    },
+  ]);
+
+  if (monthlyParcels.length === 0) {
+    // Optional: show last 12 months with 0 parcels
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const currentMonth = new Date().getMonth(); // 0-11
+    monthlyParcels = [];
+    for (let i = 11; i >= 0; i--) {
+      const monthIndex = (currentMonth - i + 12) % 12;
+      monthlyParcels.push({ month: months[monthIndex], parcels: 0 });
+    }
+  }
+
+  return {
+    statusCounts,
+    monthlyParcels,
+  };
+};
+
 export const ParcelServices = {
   getParcelsByTrackingId,
   createParcel,
@@ -139,4 +208,5 @@ export const ParcelServices = {
   blockParcel,
   unblockParcel,
   updateParcelStatus,
+  getParcelStats
 };
